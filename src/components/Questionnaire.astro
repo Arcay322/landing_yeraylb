@@ -263,7 +263,7 @@ const provinces = [
                   class="mt-1 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900"
                 />
                 <span class="text-xs text-slate-400 leading-normal">
-                  Acepto la <a href="#" class="text-emerald-400 underline hover:text-emerald-300">Política de Privacidad</a> y el tratamiento de mis datos para la evaluación de mi caso.
+                  Acepto la <button type="button" id="open-privacy-modal" class="text-emerald-400 underline hover:text-emerald-300 font-semibold focus:outline-none transition-colors">Política de Privacidad</button> y el tratamiento de mis datos para la evaluación de mi caso.
                 </span>
               </label>
               <p id="err-privacy" class="hidden text-xs text-rose-400 mt-1 font-medium flex items-center gap-1">
@@ -318,6 +318,35 @@ const provinces = [
       </div>
 
     </div> <!-- End Card Container -->
+
+    <!-- Privacy Policy Modal Overlay -->
+    <div id="privacy-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="glass-panel bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="font-display text-lg font-bold text-white flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Política de Privacidad
+          </h3>
+          <button type="button" id="close-privacy-modal" class="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="text-xs text-slate-300 space-y-3 leading-relaxed">
+          <p><strong>1. Responsable del Tratamiento:</strong> Defensa del Deudor, conforme al Reglamento General de Protección de Datos (RGPD UE 2016/679) y la LOPD-GDD 3/2018.</p>
+          <p><strong>2. Finalidad:</strong> Analizar la viabilidad jurídica de su caso de insolvencia y Segunda Oportunidad en España, y gestionar la solicitud de asesoramiento gratuito.</p>
+          <p><strong>3. Legitimación:</strong> Su consentimiento explícito otorgado al pulsar el botón de envío y aceptar las presentes condiciones.</p>
+          <p><strong>4. Destinatarios:</strong> Sus datos no se cederán a terceros ajenos salvo a los despachos de abogados partners autorizados en su provincia de residencia para la atención de su consulta.</p>
+          <p><strong>5. Derechos:</strong> Puede ejercitar en cualquier momento sus derechos de acceso, rectificación, supresión y oposición mediante comunicación escrita a través de nuestro canal de atención al cliente.</p>
+        </div>
+
+        <div class="pt-2 text-right">
+          <button type="button" id="close-privacy-btn" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-emerald-500/20">
+            Entendido y Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Trust badges below container -->
     <div class="flex items-center justify-center gap-4 text-xs font-medium text-slate-500 mt-6">
@@ -502,6 +531,32 @@ const provinces = [
         if (!provinciaDropdown?.contains(target) && !provinciaTrigger?.contains(target)) {
           toggleProvinciaDropdown(false);
         }
+      });
+
+      // Privacy Policy Modal Logic
+      const openPrivacyModalBtn = document.getElementById('open-privacy-modal');
+      const closePrivacyModalBtn = document.getElementById('close-privacy-modal');
+      const closePrivacyBtn = document.getElementById('close-privacy-btn');
+      const privacyModal = document.getElementById('privacy-modal');
+
+      function togglePrivacyModal(show: boolean) {
+        if (show) {
+          privacyModal?.classList.remove('hidden');
+        } else {
+          privacyModal?.classList.add('hidden');
+        }
+      }
+
+      openPrivacyModalBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePrivacyModal(true);
+      });
+
+      closePrivacyModalBtn?.addEventListener('click', () => togglePrivacyModal(false));
+      closePrivacyBtn?.addEventListener('click', () => togglePrivacyModal(false));
+      privacyModal?.addEventListener('click', (e) => {
+        if (e.target === privacyModal) togglePrivacyModal(false);
       });
 
       function validateNombre() {
