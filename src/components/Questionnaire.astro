@@ -157,44 +157,48 @@ const provinces = [
             </p>
           </div>
 
-          <form id="lead-form" class="space-y-4">
+          <form id="lead-form" class="space-y-4" novalidate>
             <div>
-              <label for="nombre" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Nombre Completo *
+              <label for="nombre" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <span>Nombre Completo *</span>
               </label>
               <input 
                 type="text" 
                 id="nombre" 
                 name="nombre" 
-                required 
                 placeholder="Ej. María García López" 
                 class="glass-input w-full px-4 py-3 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none transition-all"
               />
+              <p id="err-nombre" class="hidden text-xs text-rose-400 mt-1 font-medium flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                <span>Introduce tu nombre completo (mínimo 3 caracteres).</span>
+              </p>
             </div>
 
             <div>
-              <label for="telefono" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Teléfono Móvil *
+              <label for="telefono" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <span>Teléfono Móvil *</span>
               </label>
               <input 
                 type="tel" 
                 id="telefono" 
                 name="telefono" 
-                required 
                 placeholder="600 000 000" 
-                pattern="[0-9]{9}"
                 class="glass-input w-full px-4 py-3 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none transition-all"
               />
+              <p id="err-telefono" class="hidden text-xs text-rose-400 mt-1 font-medium flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                <span>Escribe un móvil válido en España (9 dígitos, ej: 600 000 000).</span>
+              </p>
             </div>
 
             <div>
-              <label for="provincia" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Provincia de Residencia *
+              <label for="provincia" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <span>Provincia de Residencia *</span>
               </label>
               <select 
                 id="provincia" 
                 name="provincia" 
-                required 
                 class="glass-input w-full px-4 py-3 rounded-xl text-slate-100 text-sm focus:outline-none transition-all bg-slate-900"
               >
                 <option value="" disabled selected>Selecciona tu provincia...</option>
@@ -202,6 +206,10 @@ const provinces = [
                   <option value={prov}>{prov}</option>
                 ))}
               </select>
+              <p id="err-provincia" class="hidden text-xs text-rose-400 mt-1 font-medium flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                <span>Por favor, selecciona tu provincia.</span>
+              </p>
             </div>
 
             <div class="pt-2">
@@ -210,13 +218,16 @@ const provinces = [
                   type="checkbox" 
                   id="privacy" 
                   name="privacy" 
-                  required 
                   class="mt-1 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900"
                 />
                 <span class="text-xs text-slate-400 leading-normal">
                   Acepto la <a href="#" class="text-emerald-400 underline hover:text-emerald-300">Política de Privacidad</a> y el tratamiento de mis datos para la evaluación de mi caso.
                 </span>
               </label>
+              <p id="err-privacy" class="hidden text-xs text-rose-400 mt-1 font-medium flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                <span>Debes aceptar la política de privacidad.</span>
+              </p>
             </div>
 
             <!-- Disclaimer box -->
@@ -361,18 +372,83 @@ const provinces = [
       });
     });
 
-    // Form Submission & Webhook Handling
+    // Form Submission & Live Inline Webhook Handling
     if (leadForm) {
       const nombreInput = document.getElementById('nombre') as HTMLInputElement;
       const telefonoInput = document.getElementById('telefono') as HTMLInputElement;
       const provinciaSelect = document.getElementById('provincia') as HTMLSelectElement;
       const privacyCheck = document.getElementById('privacy') as HTMLInputElement;
 
-      // Clean red border on input
-      [nombreInput, telefonoInput, provinciaSelect, privacyCheck].forEach((el) => {
-        if (!el) return;
-        el.addEventListener('input', () => {
-          el.classList.remove('border-rose-500', 'ring-1', 'ring-rose-500');
+      const errNombre = document.getElementById('err-nombre');
+      const errTelefono = document.getElementById('err-telefono');
+      const errProvincia = document.getElementById('err-provincia');
+      const errPrivacy = document.getElementById('err-privacy');
+
+      function validateNombre() {
+        const val = nombreInput.value.trim();
+        if (val.length < 3) {
+          nombreInput.classList.add('border-rose-500', 'bg-rose-500/5');
+          nombreInput.classList.remove('border-emerald-500/40', 'bg-emerald-500/5');
+          if (errNombre) errNombre.classList.remove('hidden');
+          return false;
+        } else {
+          nombreInput.classList.remove('border-rose-500', 'bg-rose-500/5');
+          nombreInput.classList.add('border-emerald-500/40');
+          if (errNombre) errNombre.classList.add('hidden');
+          return true;
+        }
+      }
+
+      function validateTelefono() {
+        const rawPhone = telefonoInput.value.replace(/\s+/g, '').replace(/-/g, '').replace(/\+34/, '');
+        const phoneRegex = /^[6789]\d{8}$/;
+        if (!phoneRegex.test(rawPhone)) {
+          telefonoInput.classList.add('border-rose-500', 'bg-rose-500/5');
+          telefonoInput.classList.remove('border-emerald-500/40');
+          if (errTelefono) errTelefono.classList.remove('hidden');
+          return false;
+        } else {
+          telefonoInput.classList.remove('border-rose-500', 'bg-rose-500/5');
+          telefonoInput.classList.add('border-emerald-500/40');
+          if (errTelefono) errTelefono.classList.add('hidden');
+          return true;
+        }
+      }
+
+      function validateProvincia() {
+        if (!provinciaSelect.value) {
+          provinciaSelect.classList.add('border-rose-500', 'bg-rose-500/5');
+          provinciaSelect.classList.remove('border-emerald-500/40');
+          if (errProvincia) errProvincia.classList.remove('hidden');
+          return false;
+        } else {
+          provinciaSelect.classList.remove('border-rose-500', 'bg-rose-500/5');
+          provinciaSelect.classList.add('border-emerald-500/40');
+          if (errProvincia) errProvincia.classList.add('hidden');
+          return true;
+        }
+      }
+
+      function validatePrivacy() {
+        if (!privacyCheck.checked) {
+          privacyCheck.classList.add('ring-2', 'ring-rose-500');
+          if (errPrivacy) errPrivacy.classList.remove('hidden');
+          return false;
+        } else {
+          privacyCheck.classList.remove('ring-2', 'ring-rose-500');
+          if (errPrivacy) errPrivacy.classList.add('hidden');
+          return true;
+        }
+      }
+
+      // Live validation on typing & blur
+      nombreInput?.addEventListener('blur', validateNombre);
+      telefonoInput?.addEventListener('blur', validateTelefono);
+      provinciaSelect?.addEventListener('change', validateProvincia);
+      privacyCheck?.addEventListener('change', validatePrivacy);
+
+      [nombreInput, telefonoInput].forEach((input) => {
+        input?.addEventListener('input', () => {
           if (formError) formError.classList.add('hidden');
         });
       });
@@ -382,54 +458,21 @@ const provinces = [
         
         if (formError) formError.classList.add('hidden');
 
-        // Validation 1: Nombre (mínimo 3 caracteres)
-        const nombreVal = nombreInput.value.trim();
-        if (nombreVal.length < 3) {
-          nombreInput.classList.add('border-rose-500', 'ring-1', 'ring-rose-500');
+        const isNombreValid = validateNombre();
+        const isTelefonoValid = validateTelefono();
+        const isProvinciaValid = validateProvincia();
+        const isPrivacyValid = validatePrivacy();
+
+        if (!isNombreValid || !isTelefonoValid || !isProvinciaValid || !isPrivacyValid) {
           if (formError) {
-            formError.textContent = 'Por favor, introduce tu nombre completo válido (mínimo 3 caracteres).';
+            formError.textContent = 'Por favor, corrige los campos señalados en rojo antes de enviar.';
             formError.classList.remove('hidden');
           }
-          nombreInput.focus();
           return;
         }
 
-        // Validation 2: Teléfono móvil en España (9 dígitos, comenzando por 6, 7, 8 o 9)
         const rawPhone = telefonoInput.value.replace(/\s+/g, '').replace(/-/g, '').replace(/\+34/, '');
-        const phoneRegex = /^[6789]\d{8}$/;
-        if (!phoneRegex.test(rawPhone)) {
-          telefonoInput.classList.add('border-rose-500', 'ring-1', 'ring-rose-500');
-          if (formError) {
-            formError.textContent = 'Por favor, escribe un número de teléfono móvil válido en España (9 dígitos).';
-            formError.classList.remove('hidden');
-          }
-          telefonoInput.focus();
-          return;
-        }
-
-        // Validation 3: Selección de Provincia
-        if (!provinciaSelect.value) {
-          provinciaSelect.classList.add('border-rose-500', 'ring-1', 'ring-rose-500');
-          if (formError) {
-            formError.textContent = 'Por favor, selecciona tu provincia de residencia.';
-            formError.classList.remove('hidden');
-          }
-          provinciaSelect.focus();
-          return;
-        }
-
-        // Validation 4: Checkbox de Privacidad
-        if (!privacyCheck.checked) {
-          privacyCheck.classList.add('ring-2', 'ring-rose-500');
-          if (formError) {
-            formError.textContent = 'Debes aceptar la política de privacidad para solicitar tu evaluación gratuita.';
-            formError.classList.remove('hidden');
-          }
-          privacyCheck.focus();
-          return;
-        }
-
-        formData.nombre = nombreVal;
+        formData.nombre = nombreInput.value.trim();
         formData.telefono = rawPhone;
         formData.provincia = provinciaSelect.value;
         formData.fecha = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
