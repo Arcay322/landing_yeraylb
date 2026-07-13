@@ -1,4 +1,7 @@
 ---
+import siteContent from '../data/site-content.json';
+const { tag, title, steps: questSteps } = siteContent.questionnaire;
+
 const provinces = [
   "Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila", "Badajoz", "Barcelona", 
   "Burgos", "Cáceres", "Cádiz", "Cantabria", "Castellón", "Ciudad Real", "Córdoba", "Cuenca", 
@@ -19,10 +22,10 @@ const provinces = [
       <!-- Top Section Header -->
       <div class="text-center mb-8">
         <span class="text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block mb-3">
-          EVALUACIÓN GRATUITA
+          {tag}
         </span>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white">
-          Comprueba tu caso ahora.
+          {title}
         </h2>
       </div>
 

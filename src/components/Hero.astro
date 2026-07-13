@@ -1,4 +1,16 @@
 ---
+import siteContent from '../data/site-content.json';
+const { 
+  badge, 
+  titlePrefix, 
+  titleHighlightSeconds, 
+  titleMiddle, 
+  titleHighlightPercentage, 
+  titleSuffix, 
+  subtitle, 
+  ctaText, 
+  trustBadges 
+} = siteContent.hero;
 ---
 
 <section class="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden">
@@ -12,17 +24,17 @@
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
       </span>
-      <span>Ley de Segunda Oportunidad · Real Decreto-ley 1/2015</span>
+      <span>{badge}</span>
     </div>
 
     <!-- Main Title -->
     <h1 class="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-50 tracking-tight leading-[1.15] mb-6">
-      Comprueba en <span class="text-emerald-400">30 segundos</span> si cumples los requisitos legales para cancelar hasta el <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">100% de tus deudas</span> en España.
+      {titlePrefix}<span class="text-emerald-400">{titleHighlightSeconds}</span>{titleMiddle}<span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">{titleHighlightPercentage}</span>{titleSuffix}
     </h1>
 
     <!-- Subtitle -->
     <p class="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-      Evaluación gratuita, confidencial y sin compromiso. Conforme al Real Decreto-ley 1/2015 de la Ley de Segunda Oportunidad.
+      {subtitle}
     </p>
 
     <!-- Main CTA Button -->
@@ -31,7 +43,7 @@
         href="#cuestionario" 
         class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-lg sm:text-xl shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] btn-glow group"
       >
-        <span>Comprobar mi caso</span>
+        <span>{ctaText}</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-300 group-hover:translate-y-1 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14"/>
           <path d="m19 12-7 7-7-7"/>
@@ -40,11 +52,12 @@
 
       <!-- Micro Trust Indicator -->
       <p class="text-xs sm:text-sm text-slate-400 font-medium flex items-center justify-center flex-wrap gap-2 mt-2">
-        <span>Sin compromiso</span>
-        <span class="text-slate-600">•</span>
-        <span>100% confidencial</span>
-        <span class="text-slate-600">•</span>
-        <span>Tarda menos de 30 segundos</span>
+        {trustBadges.map((badge, idx) => (
+          <>
+            <span>{badge}</span>
+            {idx < trustBadges.length - 1 && <span class="text-slate-600">•</span>}
+          </>
+        ))}
       </p>
     </div>
   </div>

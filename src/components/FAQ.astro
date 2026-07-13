@@ -1,22 +1,6 @@
 ---
-const faqs = [
-  {
-    question: "¿Qué es la Ley de Segunda Oportunidad y a quién beneficia?",
-    answer: "La Ley de Segunda Oportunidad (Real Decreto-ley 1/2015) es un mecanismo legal en España que permite a particulares y autónomos sobreendeudados o en situación de insolvencia cancelar hasta el 100% de sus deudas no impagables y empezar de cero sin embargos."
-  },
-  {
-    question: "¿Es posible paralizar embargos de nómina y vivienda de inmediato?",
-    answer: "Sí. Una vez iniciado el procedimiento legal conforme a la Ley de Segunda Oportunidad, la ley exige la congelación e interrupción inmediata de todas las ejecuciones de embargo, así como la parada del cobro de intereses y llamadas de acoso de cobradores."
-  },
-  {
-    question: "¿Qué tipo de deudas se pueden cancelar?",
-    answer: "Se pueden cancelar préstamos personales, tarjetas de crédito, microcréditos, deudas con entidades bancarias, financieras y parte de las deudas con Administraciones Públicas (Hacienda y Seguridad Social) conforme a las sentencias del Tribunal Supremo."
-  },
-  {
-    question: "¿Cuánto cuesta la evaluación inicial de mi caso?",
-    answer: "La evaluación inicial de viabilidad es 100% gratuita y sin compromiso. Analizamos tu situación de endeudamiento en menos de 24-48 horas y un abogado especialista en tu provincia te explicará de forma clara tus opciones legales."
-  }
-];
+import siteContent from '../data/site-content.json';
+const { tag, title, items: faqs } = siteContent.faq;
 ---
 
 <section id="faq" class="py-16 relative">
@@ -24,16 +8,16 @@ const faqs = [
     <!-- Section Header -->
     <div class="text-center mb-12">
       <span class="text-xs font-bold tracking-widest text-slate-400 uppercase bg-slate-900 border border-slate-800 px-3 py-1 rounded-md mb-3 inline-block">
-        PREGUNTAS FRECUENTES
+        {tag}
       </span>
       <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-        Todo lo que necesitas saber antes de empezar.
+        {title}
       </h2>
     </div>
 
     <!-- Accordion Wrapper -->
     <div class="space-y-4">
-      {faqs.map((faq, index) => (
+      {faqs.map((faq) => (
         <div class="faq-item glass-card rounded-2xl border border-slate-800/80 overflow-hidden transition-all duration-200">
           <button 
             type="button" 
