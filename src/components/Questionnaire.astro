@@ -192,20 +192,62 @@ const provinces = [
               </p>
             </div>
 
-            <div>
-              <label for="provincia" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+            <div class="relative">
+              <label for="provincia-trigger" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                 <span>Provincia de Residencia *</span>
               </label>
-              <select 
-                id="provincia" 
-                name="provincia" 
-                class="glass-input w-full px-4 py-3 rounded-xl text-slate-100 text-sm focus:outline-none transition-all bg-slate-900"
+              
+              <!-- Hidden input to store selected value -->
+              <input type="hidden" id="provincia" name="provincia" value="" />
+
+              <!-- Trigger Button -->
+              <button 
+                type="button" 
+                id="provincia-trigger" 
+                class="glass-input w-full px-4 py-3 rounded-xl text-slate-400 text-sm focus:outline-none transition-all flex items-center justify-between group text-left border border-slate-800 hover:border-slate-700 bg-slate-900/90"
               >
-                <option value="" disabled selected>Selecciona tu provincia...</option>
-                {provinces.map((prov) => (
-                  <option value={prov}>{prov}</option>
-                ))}
-              </select>
+                <span id="provincia-selected-text">Selecciona tu provincia...</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 group-hover:text-slate-200 transition-transform duration-200" id="provincia-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+
+              <!-- Custom Dropdown Menu -->
+              <div 
+                id="provincia-dropdown" 
+                class="hidden absolute left-0 right-0 top-full mt-2 glass-panel bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl z-50 p-2 overflow-hidden backdrop-blur-xl"
+              >
+                <!-- Search Box Inside Dropdown -->
+                <div class="relative mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.3-4.3"/>
+                  </svg>
+                  <input 
+                    type="text" 
+                    id="provincia-search" 
+                    placeholder="Buscar provincia..." 
+                    class="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                </div>
+
+                <!-- Scrollable Options List -->
+                <div id="provincia-list" class="max-h-48 overflow-y-auto space-y-0.5 pr-1 text-sm custom-scrollbar">
+                  {provinces.map((prov) => (
+                    <button 
+                      type="button" 
+                      data-prov={prov} 
+                      class="provincia-option w-full text-left px-3 py-2 rounded-lg text-slate-300 hover:bg-emerald-500/20 hover:text-emerald-300 transition-colors flex items-center justify-between text-xs font-medium"
+                    >
+                      <span>{prov}</span>
+                    </button>
+                  ))}
+                  <div id="no-provincia-found" class="hidden py-4 text-center text-xs text-slate-500">
+                    No se encontró ninguna provincia
+                  </div>
+                </div>
+              </div>
+
               <p id="err-provincia" class="hidden text-xs text-rose-400 mt-1 font-medium flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
                 <span>Por favor, selecciona tu provincia.</span>
@@ -384,6 +426,84 @@ const provinces = [
       const errProvincia = document.getElementById('err-provincia');
       const errPrivacy = document.getElementById('err-privacy');
 
+      // Custom Combobox / Searchable Dropdown elements
+      const provinciaInput = document.getElementById('provincia') as HTMLInputElement;
+      const provinciaTrigger = document.getElementById('provincia-trigger') as HTMLButtonElement;
+      const provinciaSelectedText = document.getElementById('provincia-selected-text');
+      const provinciaChevron = document.getElementById('provincia-chevron');
+      const provinciaDropdown = document.getElementById('provincia-dropdown');
+      const provinciaSearch = document.getElementById('provincia-search') as HTMLInputElement;
+      const provinciaOptions = document.querySelectorAll('.provincia-option');
+      const noProvinciaFound = document.getElementById('no-provincia-found');
+
+      function toggleProvinciaDropdown(open?: boolean) {
+        const shouldOpen = open !== undefined ? open : provinciaDropdown?.classList.contains('hidden');
+        if (shouldOpen) {
+          provinciaDropdown?.classList.remove('hidden');
+          provinciaChevron?.classList.add('rotate-180');
+          provinciaSearch?.focus();
+        } else {
+          provinciaDropdown?.classList.add('hidden');
+          provinciaChevron?.classList.remove('rotate-180');
+        }
+      }
+
+      provinciaTrigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleProvinciaDropdown();
+      });
+
+      provinciaSearch?.addEventListener('input', () => {
+        const query = provinciaSearch.value.toLowerCase().trim();
+        let matchCount = 0;
+
+        provinciaOptions.forEach((opt) => {
+          const provName = (opt.getAttribute('data-prov') || '').toLowerCase();
+          if (provName.includes(query)) {
+            (opt as HTMLElement).style.display = 'flex';
+            matchCount++;
+          } else {
+            (opt as HTMLElement).style.display = 'none';
+          }
+        });
+
+        if (noProvinciaFound) {
+          if (matchCount === 0) {
+            noProvinciaFound.classList.remove('hidden');
+          } else {
+            noProvinciaFound.classList.add('hidden');
+          }
+        }
+      });
+
+      provinciaOptions.forEach((opt) => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const selectedProv = opt.getAttribute('data-prov') || '';
+          if (provinciaInput) provinciaInput.value = selectedProv;
+          if (provinciaSelectedText) {
+            provinciaSelectedText.textContent = selectedProv;
+            provinciaSelectedText.classList.remove('text-slate-400');
+            provinciaSelectedText.classList.add('text-slate-100', 'font-semibold');
+          }
+
+          // Highlight selected
+          provinciaOptions.forEach((o) => o.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'font-bold'));
+          opt.classList.add('bg-emerald-500/20', 'text-emerald-400', 'font-bold');
+
+          toggleProvinciaDropdown(false);
+          validateProvincia();
+        });
+      });
+
+      // Close on click outside
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (!provinciaDropdown?.contains(target) && !provinciaTrigger?.contains(target)) {
+          toggleProvinciaDropdown(false);
+        }
+      });
+
       function validateNombre() {
         const val = nombreInput.value.trim();
         if (val.length < 3) {
@@ -416,14 +536,14 @@ const provinces = [
       }
 
       function validateProvincia() {
-        if (!provinciaSelect.value) {
-          provinciaSelect.classList.add('border-rose-500', 'bg-rose-500/5');
-          provinciaSelect.classList.remove('border-emerald-500/40');
+        if (!provinciaInput.value) {
+          provinciaTrigger.classList.add('border-rose-500', 'bg-rose-500/5');
+          provinciaTrigger.classList.remove('border-emerald-500/40');
           if (errProvincia) errProvincia.classList.remove('hidden');
           return false;
         } else {
-          provinciaSelect.classList.remove('border-rose-500', 'bg-rose-500/5');
-          provinciaSelect.classList.add('border-emerald-500/40');
+          provinciaTrigger.classList.remove('border-rose-500', 'bg-rose-500/5');
+          provinciaTrigger.classList.add('border-emerald-500/40');
           if (errProvincia) errProvincia.classList.add('hidden');
           return true;
         }
@@ -474,7 +594,7 @@ const provinces = [
         const rawPhone = telefonoInput.value.replace(/\s+/g, '').replace(/-/g, '').replace(/\+34/, '');
         formData.nombre = nombreInput.value.trim();
         formData.telefono = rawPhone;
-        formData.provincia = provinciaSelect.value;
+        formData.provincia = provinciaInput.value;
         formData.fecha = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
 
         // Disable button while submitting
