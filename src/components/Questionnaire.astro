@@ -685,6 +685,11 @@ const provinces = [
           console.warn('Network issue or webhook notice:', err);
         }
 
+        // Fire Meta Pixel Lead Conversion Event
+        if (typeof (window as any).fbq === 'function') {
+          (window as any).fbq('track', 'Lead');
+        }
+
         // Show Success view
         if (quizContainer && successView) {
           quizContainer.classList.add('hidden');
